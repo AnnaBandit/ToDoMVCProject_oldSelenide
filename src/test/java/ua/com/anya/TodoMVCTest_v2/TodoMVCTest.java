@@ -43,6 +43,7 @@ public class TodoMVCTest {
     @Test
     public void testEditAndSaveByPressingEnterOnActiveFilter(){
         given(Filter.ACTIVE, aTask("1", Task.Status.ACTIVE));
+        
         startEdit("1", "1-edited").pressEnter();
         assertVisibleTasks("1-edited");
     }
@@ -290,7 +291,6 @@ public class TodoMVCTest {
     }
 
     private void given(Filter filter, Task... tasks){
-
         open("https://todomvc4tasj.herokuapp.com/");
 
         String js = "localStorage.setItem('todos-troopjs', '[";
