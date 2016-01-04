@@ -2,7 +2,7 @@ package ua.com.anya.TodoMVCTest_v2;
 
 public class Task {
     public enum Status {
-        COMPLETED, ACTIVE
+        ACTIVE, COMPLETED
     }
     String name;
     Status status;
@@ -10,5 +10,6 @@ public class Task {
     Task(String name, Status status){
         this.name = name;
         this.status = status;
-    }
+    };
+
 }

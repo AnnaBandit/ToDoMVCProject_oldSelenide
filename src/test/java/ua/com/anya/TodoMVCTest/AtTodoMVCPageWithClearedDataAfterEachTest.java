@@ -6,7 +6,7 @@ import org.junit.Before;
 import static com.codeborne.selenide.Selenide.executeJavaScript;
 import static com.codeborne.selenide.Selenide.open;
 
-public class AtTodoMVCPageWithClearedDataAfterEachTest extends BaseTest{
+public class AtTodoMVCPageWithClearedDataAfterEachTest extends PostScreenshot{
 
     @Before
     public void openApp(){

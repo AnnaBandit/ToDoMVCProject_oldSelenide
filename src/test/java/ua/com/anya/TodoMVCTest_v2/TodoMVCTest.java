@@ -6,317 +6,379 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.By;
-import ru.yandex.qatools.allure.annotations.Step;
+import ua.com.anya.TodoMVCTest_v2.Task.Status;
 
 import static com.codeborne.selenide.CollectionCondition.empty;
 import static com.codeborne.selenide.CollectionCondition.exactTexts;
 import static com.codeborne.selenide.Condition.*;
-import static com.codeborne.selenide.Condition.exactText;
 import static com.codeborne.selenide.Selenide.*;
+import static com.codeborne.selenide.WebDriverRunner.url;
+import static ua.com.anya.TodoMVCTest_v2.Task.Status.ACTIVE;
+import static ua.com.anya.TodoMVCTest_v2.Task.Status.COMPLETED;
 
 public class TodoMVCTest {
+
+    @Before
+    public void openApp(){
+        open("https://todomvc4tasj.herokuapp.com/");
+    }
 
     @After
     public void clearData(){
         executeJavaScript("localStorage.clear()");
     }
 
-    @Test
-    public void testCreateOnCompletedFilter(){
-        given(Filter.COMPLETED, aTask("1", Task.Status.ACTIVE));
-
-        add("2");
-        assertItemsLeft(2);
-        openActiveFilter();
-        assertExistingTasks("1", "2");
-    }
-
+    //test edit, complete all, clear completed, activate, activate all, cancel edit, edit with saving by clicking outside, delete while editing on All filter
     @Test
     public void testEditOnAllFilter(){
-        given(Filter.ALL, aTask("1", Task.Status.ACTIVE));
+        givenAtAll(aTask("a", ACTIVE),
+                   aTask("b", ACTIVE),
+                   aTask("c", ACTIVE));
 
-        startEdit("1", "1-edited").pressEnter();
-        assertExistingTasks("1-edited");
-    }
-
-
-    @Test
-    public void testEditAndSaveByPressingEnterOnActiveFilter(){
-        given(Filter.ACTIVE, aTask("1", Task.Status.ACTIVE));
-        startEdit("1", "1-edited").pressEnter();
-        assertVisibleTasks("1-edited");
+        startEdit("b", "b-edited").pressEnter();
+        assertItemsLeft(3);
+        assertExistingTasks("a", "b-edited", "c");
     }
 
     @Test
-    public void testEditOnCompletedFilter(){
-        given(Filter.COMPLETED, aTask("1", Task.Status.COMPLETED));
+    public void testCompleteAllOnAllFilter(){
+        givenAtAll("a", "b");
 
-        startEdit("1", "1-edited").pressEnter();
-        assertVisibleTasks("1-edited");
+        toggleAll();
+        assertItemsLeft(0);
+        openCompletedFilter();
+        assertExistingTasks("a", "b");
     }
+
+    @Test
+    public void testClearCompletedOnAllFilter(){
+        givenAtAll(aTask("a", COMPLETED),
+                   aTask("b", COMPLETED),
+                   aTask("c", ACTIVE));
+
+        clearCompleted();
+        assertExistingTasks("c");
+        assertItemsLeft(1);
+        openCompletedFilter();
+        assertVisibleTasksListIsEmpty();
+    }
+
+    @Test
+    public void testActivateAllOnAllFilter(){
+        givenAtAll(aTask("a", COMPLETED),
+                   aTask("b", COMPLETED));
+
+        toggleAll();
+        assertItemsLeft(2);
+        openActiveFilter();
+        assertExistingTasks("a", "b");
+    }
+
+    @Test
+    public void testActivateOnAllFilter(){
+        givenAtAll(aTask("a", COMPLETED));
+
+        toggle("a");
+        assertItemsLeft(1);
+        openActiveFilter();
+        assertExistingTasks("a");
+    }
+
 
     @Test
     public void testCancelEditingByESC(){
-        given(Filter.ALL, aTask("1", Task.Status.ACTIVE));
+        givenAtAll("a");
 
-        startEdit("1", "1-edited").pressEscape();
-        assertExistingTasks("1");
+        startEdit("a", "a-edited").pressEscape();
+        assertExistingTasks("a");
         assertItemsLeft(1);
     }
 
     @Test
     public void testEditAndSaveByClickingOutside(){
-        given(Filter.ALL, aTask("1", Task.Status.ACTIVE));
+        givenAtAll("a", "b", "c");
 
-        startEdit("1", "1-edited");
-        add("2");
-        assertExistingTasks("1-edited", "2");
-        assertItemsLeft(2);
+        startEdit("c", "c-edited");
+        add("d");
+        assertExistingTasks("a", "b", "c-edited", "d");
+        assertItemsLeft(4);
     }
 
     @Test
     public void testDeleteWhileEditing(){
-        given(Filter.ALL, aTask("1", Task.Status.ACTIVE), aTask("2", Task.Status.ACTIVE));
+        givenAtAll("a", "b");
 
-        startEdit("1", "").pressEnter();
-        assertExistingTasks("2");
+        startEdit("a", "").pressEnter();
+        assertExistingTasks("b");
         assertItemsLeft(1);
     }
 
+    //test delete, complete all, clear completed, edit by pressing enter on Active filter
     @Test
     public void testDeleteOnActiveFilter(){
-        given(Filter.ACTIVE, aTask("1", Task.Status.ACTIVE));
+        givenAtActive("a");
 
-        delete("1");
+        delete("a");
         assertExistingTasksListIsEmpty();
-    }
-
-    @Test
-    public void testDeleteOnCompletedFilter(){
-        given(Filter.COMPLETED, aTask("1", Task.Status.COMPLETED));
-
-        delete("1");
-        assertExistingTasksListIsEmpty();
-    }
-
-    @Test
-    public void testCompleteAllOnAllFilter(){
-        given(Filter.ALL, aTask("1", Task.Status.ACTIVE), aTask("2", Task.Status.ACTIVE));
-
-        toggleAll();
-        assertItemsLeft(0);
-        openCompletedFilter();
-        assertExistingTasks("1", "2");
     }
 
     @Test
     public void testCompleteAllOnActiveFilter(){
-        given(Filter.ACTIVE, aTask("1", Task.Status.ACTIVE), aTask("2", Task.Status.ACTIVE));
+        givenAtActive("a", "b");
 
         toggleAll();
         assertVisibleTasksListIsEmpty();
         openCompletedFilter();
-        assertVisibleTasks("1", "2");
-    }
-
-    @Test
-    public void testClearCompletedOnAllFilter(){
-        given(Filter.ALL, aTask("1", Task.Status.COMPLETED), aTask("2", Task.Status.COMPLETED), aTask("3", Task.Status.ACTIVE));
-
-        clearCompleted();
-        assertExistingTasks("3");
-        assertItemsLeft(1);
-        openCompletedFilter();
-        assertVisibleTasksListIsEmpty();
+        assertVisibleTasks("a", "b");
     }
 
     @Test
     public void testClearCompletedOnActiveFilter(){
-        given(Filter.ACTIVE, aTask("1", Task.Status.COMPLETED), aTask("2", Task.Status.COMPLETED), aTask("3", Task.Status.ACTIVE));
+        givenAtActive(aTask("a", COMPLETED),
+                      aTask("b", COMPLETED),
+                      aTask("c", ACTIVE));
 
         clearCompleted();
         assertItemsLeft(1);
-        assertExistingTasks("3");
+        assertExistingTasks("c");
         openCompletedFilter();
         assertVisibleTasksListIsEmpty();
     }
 
     @Test
-    public void testActivateOnAllFilter(){
-        given(Filter.ALL, aTask("1", Task.Status.COMPLETED));
+    public void testEditAndSaveByPressingEnterOnActiveFilter(){
+        givenAtActive("a");
 
-        toggle("1");
+        startEdit("a", "a-edited").pressEnter();
+        assertVisibleTasks("a-edited");
         assertItemsLeft(1);
+    }
+
+    //test create, edit, delete, activate all on Completed filter
+    @Test
+    public void testCreateOnCompletedFilter(){
+        givenAtCompleted("a");
+
+        add("b");
+        assertVisibleTasksListIsEmpty();
+        assertItemsLeft(2);
         openActiveFilter();
-        assertExistingTasks("1");
+        assertExistingTasks("a", "b");
     }
 
     @Test
-    public void testActivateAllOnAllFilter(){
-        given(Filter.ALL, aTask("1", Task.Status.COMPLETED), aTask("2", Task.Status.COMPLETED));
+    public void testEditOnCompletedFilter(){
+        givenAtCompleted(aTask("a", COMPLETED));
 
-        toggleAll();
-        assertItemsLeft(2);
-        openActiveFilter();
-        assertExistingTasks("1", "2");
+        startEdit("a", "a-edited").pressEnter();
+        assertVisibleTasks("a-edited");
+        assertItemsLeft(0);
+    }
+
+    @Test
+    public void testDeleteOnCompletedFilter(){
+        givenAtCompleted(aTask("a", COMPLETED));
+
+        delete("a");
+        assertExistingTasksListIsEmpty();
     }
 
     @Test
     public void testActivateAllOnCompletedFilter(){
-        given(Filter.COMPLETED, aTask("1", Task.Status.COMPLETED), aTask("2", Task.Status.COMPLETED));
+        givenAtCompleted(aTask("a", COMPLETED),
+                         aTask("b", COMPLETED));
 
         toggleAll();
         assertVisibleTasksListIsEmpty();
         assertItemsLeft(2);
         openActiveFilter();
-        assertVisibleTasks("1", "2");
+        assertVisibleTasks("a", "b");
     }
 
     @Test
     public void testTasksMainFlow(){
-        open("https://todomvc4tasj.herokuapp.com/");
+        givenAtAll();
 
-        add("1");
-        assertExistingTasks("1");
+        add("a");
+        assertExistingTasks("a");
 
-        toggle("1");
+        toggle("a");
         openActiveFilter();
         assertVisibleTasksListIsEmpty();
 
-        add("2");
-        toggle("2");
+        add("b");
+        toggle("b");
         assertVisibleTasksListIsEmpty();
 
         openCompletedFilter();
-        assertVisibleTasks("1", "2");
+        assertVisibleTasks("a", "b");
 
         //activate
-        toggle("2");
-        assertVisibleTasks("1");
+        toggle("b");
+        assertVisibleTasks("a");
 
         clearCompleted();
         assertVisibleTasksListIsEmpty();
 
         openAllFilter();
-        assertExistingTasks("2");
+        assertExistingTasks("b");
 
-        delete("2");
+        delete("b");
         assertExistingTasksListIsEmpty();
     }
 
 
     ElementsCollection tasksList = $$("#todo-list li");
     ElementsCollection visibleTasks = tasksList.filter(visible);
-    public enum Filter {
-        ALL, ACTIVE, COMPLETED
-    }
 
-    @Step
     void add(String... tasksTexts){
         for(String taskText: tasksTexts){
             $("#new-todo").shouldBe(enabled).setValue(taskText).pressEnter();
         }
     }
 
-    @Step
     private void assertVisibleTasks(String... tasksTexts){
         visibleTasks.shouldHave(exactTexts(tasksTexts));
     }
 
-    @Step
     private void assertVisibleTasksListIsEmpty(){
         visibleTasks.shouldBe(empty);
     }
 
-    @Step
     private void assertExistingTasks(String... tasksTexts){
         tasksList.shouldHave(exactTexts(tasksTexts));
     }
 
-    @Step
     private void assertExistingTasksListIsEmpty(){
         tasksList.shouldBe(empty);
     }
 
-    @Step
     private SelenideElement startEdit(String taskText, String newTaskText){
         tasksList.find(exactText(taskText)).find("label").doubleClick();
         return tasksList.find(cssClass("editing")).find(".edit").setValue(newTaskText);
     }
 
-    @Step
     private void delete(String taskText){
         tasksList.find(exactText(taskText)).hover().find(".destroy").click();
     }
 
-    @Step
     private void toggle(String taskText){
         tasksList.find(exactText(taskText)).find(".toggle").click();
     }
 
-    @Step
     private void toggleAll(){
         $("#toggle-all").click();
     }
 
-    @Step
     private void clearCompleted(){
         $("#clear-completed").click();
         $("#clear-completed").shouldBe(hidden);
     }
 
-    @Step
     private void assertItemsLeft(Integer counter){
         $("#todo-count>strong").shouldHave(exactText(String.valueOf(counter)));
     }
 
-    @Step
     private void openAllFilter(){
         $(By.linkText("All")).click();
     }
 
-    @Step
     private void openActiveFilter(){
         $(By.linkText("Active")).click();
     }
 
-    @Step
     private void openCompletedFilter(){
         $(By.linkText("Completed")).click();
     }
 
-    private Task aTask(String name, Task.Status status){
+    private Task aTask(String name, Status status){
         return new Task(name, status);
     }
 
-    private void given(Filter filter, Task... tasks){
-
-        open("https://todomvc4tasj.herokuapp.com/");
-
-        String js = "localStorage.setItem('todos-troopjs', '[";
-
-        for (Task task: tasks) {
-
-            if (task.status == Task.Status.ACTIVE){
-                js += "{\"completed\":false, \"title\":\"" +  task.name + "\"},";
+    private void givenAtAll(Task... tasks){
+        if (url()!=("https://todomvc4tasj.herokuapp.com/")){
+            open("https://todomvc4tasj.herokuapp.com/");
         }
-            if (task.status == Task.Status.COMPLETED){
-                js += "{\"completed\":true, \"title\":\"" +  task.name + "\"},";
-        }
-
+        addTasks(tasks);
     }
 
-        js = js.substring(0, js.length()-1) + "]');";
-        executeJavaScript(js);
-        refresh();
+    private void givenAtAll(String... tasksTexts){
+        if (url()!=("https://todomvc4tasj.herokuapp.com/")){
+            open("https://todomvc4tasj.herokuapp.com/");
+        }
+        addTasks(tasksTexts);
+    }
 
-        if (filter == Filter.ACTIVE){
+    private void givenAtAll(){
+        if (url()!=("https://todomvc4tasj.herokuapp.com/")){
+            open("https://todomvc4tasj.herokuapp.com/");
+        }
+    }
+
+    private void givenAtActive(Task... tasks){
+        addTasks(tasks);
+        if (url()!=("https://todomvc4tasj.herokuapp.com/#/active")){
             open("https://todomvc4tasj.herokuapp.com/#/active");
         }
-        if (filter == Filter.COMPLETED){
-            open("https://todomvc4tasj.herokuapp.com/#/completed");
+
+    }
+
+    private void givenAtActive(String... tasksTexts){
+        addTasks(tasksTexts);
+        if (url()!=("https://todomvc4tasj.herokuapp.com/#/active")){
+            open("https://todomvc4tasj.herokuapp.com/#/active");
         }
 
     }
 
+    private void givenAtActive(){
+        if (url()!=("https://todomvc4tasj.herokuapp.com/#/active")){
+            open("https://todomvc4tasj.herokuapp.com/#/active");
+        }
+    }
+
+    private void givenAtCompleted(Task... tasks){
+        addTasks(tasks);
+        if (url()!=("https://todomvc4tasj.herokuapp.com/#/completed")){
+            open("https://todomvc4tasj.herokuapp.com/#/completed");
+        }
+    }
+
+    private void givenAtCompleted(String... tasksTexts){
+        addTasks(tasksTexts);
+        if (url()!=("https://todomvc4tasj.herokuapp.com/#/completed")){
+            open("https://todomvc4tasj.herokuapp.com/#/completed");
+        }
+    }
+
+    private String addTaskToJS(Task task){
+        boolean isCompleted = task.status == COMPLETED;
+        return "{\"completed\":" + isCompleted + ", \"title\":\"" +  task.name + "\"},";
+    }
+
+    private String addTaskToJS(String text){
+        return "{\"completed\":false, \"title\":\"" +  text + "\"},";
+    }
+
+    private void addTasks(Task... tasks){
+        String js = "localStorage.setItem('todos-troopjs', '[";
+        for (Task task: tasks) {
+            js += addTaskToJS(task);
+        }
+        js = js.substring(0, js.length()-1) + "]');"; //removing extra "," (last character in js)
+
+        executeJavaScript(js);
+        refresh();
+    }
+
+    private void addTasks(String... texts){
+        String js = "localStorage.setItem('todos-troopjs', '[";
+        for (String text: texts) {
+            js += addTaskToJS(text);
+        }
+        js = js.substring(0, js.length()-1) + "]');"; //removing extra "," (last character in js)
+
+        executeJavaScript(js);
+        refresh();
+    }
 }
