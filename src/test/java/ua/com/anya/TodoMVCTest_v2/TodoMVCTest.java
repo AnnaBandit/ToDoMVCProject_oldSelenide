@@ -296,59 +296,38 @@ public class TodoMVCTest {
     }
 
     private void givenAtAll(Task... tasks){
-        if (url()!=("https://todomvc4tasj.herokuapp.com/")){
-            open("https://todomvc4tasj.herokuapp.com/");
-        }
         addTasks(tasks);
     }
 
     private void givenAtAll(String... tasksTexts){
-        if (url()!=("https://todomvc4tasj.herokuapp.com/")){
-            open("https://todomvc4tasj.herokuapp.com/");
-        }
         addTasks(tasksTexts);
     }
 
     private void givenAtAll(){
-        if (url()!=("https://todomvc4tasj.herokuapp.com/")){
-            open("https://todomvc4tasj.herokuapp.com/");
-        }
     }
 
     private void givenAtActive(Task... tasks){
         addTasks(tasks);
-        if (url()!=("https://todomvc4tasj.herokuapp.com/#/active")){
-            open("https://todomvc4tasj.herokuapp.com/#/active");
-        }
-
+        $(By.linkText("Active")).click();
     }
 
     private void givenAtActive(String... tasksTexts){
         addTasks(tasksTexts);
-        if (url()!=("https://todomvc4tasj.herokuapp.com/#/active")){
-            open("https://todomvc4tasj.herokuapp.com/#/active");
-        }
-
+        $(By.linkText("Active")).click();
     }
 
     private void givenAtActive(){
-        if (url()!=("https://todomvc4tasj.herokuapp.com/#/active")){
-            open("https://todomvc4tasj.herokuapp.com/#/active");
-        }
+        $(By.linkText("Active")).click();
     }
 
     private void givenAtCompleted(Task... tasks){
         addTasks(tasks);
-        if (url()!=("https://todomvc4tasj.herokuapp.com/#/completed")){
-            open("https://todomvc4tasj.herokuapp.com/#/completed");
-        }
+        $(By.linkText("Completed")).click();
     }
 
     private void givenAtCompleted(String... tasksTexts){
         addTasks(tasksTexts);
-        if (url()!=("https://todomvc4tasj.herokuapp.com/#/completed")){
-            open("https://todomvc4tasj.herokuapp.com/#/completed");
-        }
+        $(By.linkText("Completed")).click();
     }
 
     private String addTaskToJS(Task task){
