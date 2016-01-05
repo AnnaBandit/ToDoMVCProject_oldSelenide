@@ -53,6 +53,7 @@ public class TodoMVCTest {
         givenAtAll("a", "b");
 
         toggleAll();
+        assertVisibleTasks("a", "b");
         assertItemsLeft(0);
         openCompletedFilter();
         assertExistingTasks("a", "b");
@@ -156,8 +157,8 @@ public class TodoMVCTest {
                 aTask("c", ACTIVE));
 
         clearCompleted();
-        assertItemsLeft(1);
         assertExistingTasks("c");
+        assertItemsLeft(1);
         openCompletedFilter();
         assertVisibleTasksListIsEmpty();
     }
@@ -181,7 +182,7 @@ public class TodoMVCTest {
         assertVisibleTasksListIsEmpty();
         assertItemsLeft(2);
         openActiveFilter();
-        assertExistingTasks("a", "b");
+        assertVisibleTasks("a", "b");
     }
 
     @Test
