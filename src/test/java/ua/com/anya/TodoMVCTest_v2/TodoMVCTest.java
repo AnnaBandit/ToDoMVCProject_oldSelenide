@@ -12,7 +12,6 @@ import static com.codeborne.selenide.CollectionCondition.empty;
 import static com.codeborne.selenide.CollectionCondition.exactTexts;
 import static com.codeborne.selenide.Condition.*;
 import static com.codeborne.selenide.Selenide.*;
-import static com.codeborne.selenide.WebDriverRunner.url;
 import static ua.com.anya.TodoMVCTest_v2.Task.Status.ACTIVE;
 import static ua.com.anya.TodoMVCTest_v2.Task.Status.COMPLETED;
 
@@ -28,16 +27,23 @@ public class TodoMVCTest {
         executeJavaScript("localStorage.clear()");
     }
 
-    //test edit, complete all, clear completed, activate, activate all, cancel edit, edit with saving by clicking outside, delete while editing on All filter
+    //at All filter
+    @Test
+    public void testCreateOnAllFilter(){
+        givenAtAll();
+
+        add("1", "2");
+        assertExistingTasks("1", "2");
+        assertItemsLeft(2);
+    }
+
     @Test
     public void testEditOnAllFilter(){
-        givenAtAll(aTask("a", ACTIVE),
-                   aTask("b", ACTIVE),
-                   aTask("c", ACTIVE));
+        givenAtAll("a", "b", "c");
 
         startEdit("b", "b-edited").pressEnter();
-        assertItemsLeft(3);
         assertExistingTasks("a", "b-edited", "c");
+        assertItemsLeft(3);
     }
 
     @Test
@@ -59,8 +65,6 @@ public class TodoMVCTest {
         clearCompleted();
         assertExistingTasks("c");
         assertItemsLeft(1);
-        openCompletedFilter();
-        assertVisibleTasksListIsEmpty();
     }
 
     @Test
@@ -71,19 +75,19 @@ public class TodoMVCTest {
         toggleAll();
         assertItemsLeft(2);
         openActiveFilter();
-        assertExistingTasks("a", "b");
+        assertVisibleTasks("a", "b");
     }
 
     @Test
     public void testActivateOnAllFilter(){
-        givenAtAll(aTask("a", COMPLETED));
+        givenAtAll(aTask("a", COMPLETED),
+                   aTask("b", COMPLETED));
 
         toggle("a");
         assertItemsLeft(1);
         openActiveFilter();
-        assertExistingTasks("a");
+        assertVisibleTasks("a");
     }
-
 
     @Test
     public void testCancelEditingByESC(){
@@ -96,12 +100,12 @@ public class TodoMVCTest {
 
     @Test
     public void testEditAndSaveByClickingOutside(){
-        givenAtAll("a", "b", "c");
+        givenAtAll("a", "b");
 
-        startEdit("c", "c-edited");
-        add("d");
-        assertExistingTasks("a", "b", "c-edited", "d");
-        assertItemsLeft(4);
+        startEdit("b", "b-edited");
+        add("c");
+        assertExistingTasks("a", "b-edited", "c");
+        assertItemsLeft(3);
     }
 
     @Test
@@ -113,13 +117,24 @@ public class TodoMVCTest {
         assertItemsLeft(1);
     }
 
-    //test delete, complete all, clear completed, edit by pressing enter on Active filter
     @Test
-    public void testDeleteOnActiveFilter(){
-        givenAtActive("a");
+    public void testDeleteOnAllFilter(){
+        add("a", "b");
+        assertExistingTasks("a", "b");
 
         delete("a");
-        assertExistingTasksListIsEmpty();
+        assertExistingTasks("b");
+        assertItemsLeft(1);
+    }
+
+    //at Active filter
+    @Test
+    public void testEditByPressingEnterOnActiveFilter(){
+        givenAtActive("a");
+
+        startEdit("a", "a-edited").pressEnter();
+        assertVisibleTasks("a-edited");
+        assertItemsLeft(1);
     }
 
     @Test
@@ -135,8 +150,8 @@ public class TodoMVCTest {
     @Test
     public void testClearCompletedOnActiveFilter(){
         givenAtActive(aTask("a", COMPLETED),
-                      aTask("b", COMPLETED),
-                      aTask("c", ACTIVE));
+                aTask("b", COMPLETED),
+                aTask("c", ACTIVE));
 
         clearCompleted();
         assertItemsLeft(1);
@@ -146,15 +161,16 @@ public class TodoMVCTest {
     }
 
     @Test
-    public void testEditAndSaveByPressingEnterOnActiveFilter(){
-        givenAtActive("a");
+    public void testDeleteOnActiveFilter(){
+        givenAtActive("a", "b");
 
-        startEdit("a", "a-edited").pressEnter();
-        assertVisibleTasks("a-edited");
+        delete("a");
+        assertVisibleTasks("b");
         assertItemsLeft(1);
     }
 
-    //test create, edit, delete, activate all on Completed filter
+
+    //at Completed filter
     @Test
     public void testCreateOnCompletedFilter(){
         givenAtCompleted("a");
@@ -206,24 +222,17 @@ public class TodoMVCTest {
         openActiveFilter();
         assertVisibleTasksListIsEmpty();
 
-        add("b");
-        toggle("b");
-        assertVisibleTasksListIsEmpty();
-
         openCompletedFilter();
-        assertVisibleTasks("a", "b");
-
-        //activate
-        toggle("b");
         assertVisibleTasks("a");
 
-        clearCompleted();
+        //activate
+        toggle("a");
         assertVisibleTasksListIsEmpty();
 
         openAllFilter();
-        assertExistingTasks("b");
+        assertExistingTasks("a");
 
-        delete("b");
+        delete("a");
         assertExistingTasksListIsEmpty();
     }
 
@@ -336,6 +345,7 @@ public class TodoMVCTest {
     }
 
     private String addTaskToJS(String text){
+        boolean isCompleted = false;
         return "{\"completed\":false, \"title\":\"" +  text + "\"},";
     }
 
