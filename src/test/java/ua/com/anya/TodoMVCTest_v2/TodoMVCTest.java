@@ -319,26 +319,26 @@ public class TodoMVCTest {
 
     private void givenAtActive(Task... tasks){
         addTasks(tasks);
-        $(By.linkText("Active")).click();
+        openActiveFilter();
     }
 
     private void givenAtActive(String... tasksTexts){
         addTasks(convertTaskTextsIntoTasks(tasksTexts));
-        $(By.linkText("Active")).click();
+        openActiveFilter();
     }
 
     private void givenAtActive(){
-        $(By.linkText("Active")).click();
+        openActiveFilter();
     }
 
     private void givenAtCompleted(Task... tasks){
         addTasks(tasks);
-        $(By.linkText("Completed")).click();
+        openCompletedFilter();
     }
 
     private void givenAtCompleted(String... tasksTexts){
         addTasks(convertTaskTextsIntoTasks(tasksTexts));
-        $(By.linkText("Completed")).click();
+        openCompletedFilter();
     }
 
     private String addTaskToJS(Task task){
