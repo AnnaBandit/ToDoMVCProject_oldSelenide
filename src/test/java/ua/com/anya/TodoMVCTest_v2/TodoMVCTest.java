@@ -8,6 +8,8 @@ import org.junit.Test;
 import org.openqa.selenium.By;
 import ua.com.anya.TodoMVCTest_v2.Task.Status;
 
+import java.util.ArrayList;
+
 import static com.codeborne.selenide.CollectionCondition.empty;
 import static com.codeborne.selenide.CollectionCondition.exactTexts;
 import static com.codeborne.selenide.Condition.*;
@@ -300,8 +302,8 @@ public class TodoMVCTest {
         $(By.linkText("Completed")).click();
     }
 
-    private Task aTask(String name, Status status){
-        return new Task(name, status);
+    private Task aTask(String text, Status status){
+        return new Task(text, status);
     }
 
     private void givenAtAll(Task... tasks){
@@ -309,7 +311,7 @@ public class TodoMVCTest {
     }
 
     private void givenAtAll(String... tasksTexts){
-        addTasks(tasksTexts);
+        addTasks(convertTaskTextsIntoTasks(tasksTexts));
     }
 
     private void givenAtAll(){
@@ -321,7 +323,7 @@ public class TodoMVCTest {
     }
 
     private void givenAtActive(String... tasksTexts){
-        addTasks(tasksTexts);
+        addTasks(convertTaskTextsIntoTasks(tasksTexts));
         $(By.linkText("Active")).click();
     }
 
@@ -335,18 +337,13 @@ public class TodoMVCTest {
     }
 
     private void givenAtCompleted(String... tasksTexts){
-        addTasks(tasksTexts);
+        addTasks(convertTaskTextsIntoTasks(tasksTexts));
         $(By.linkText("Completed")).click();
     }
 
     private String addTaskToJS(Task task){
         boolean isCompleted = task.status == COMPLETED;
-        return "{\"completed\":" + isCompleted + ", \"title\":\"" +  task.name + "\"},";
-    }
-
-    private String addTaskToJS(String text){
-        boolean isCompleted = false;
-        return "{\"completed\":false, \"title\":\"" +  text + "\"},";
+        return "{\"completed\":" + isCompleted + ", \"title\":\"" +  task.text + "\"},";
     }
 
     private void addTasks(Task... tasks){
@@ -360,14 +357,11 @@ public class TodoMVCTest {
         refresh();
     }
 
-    private void addTasks(String... texts){
-        String js = "localStorage.setItem('todos-troopjs', '[";
-        for (String text: texts) {
-            js += addTaskToJS(text);
+    private Task[] convertTaskTextsIntoTasks(String...tasksTexts){
+        ArrayList<Task> tasks = new ArrayList<Task>();
+        for (String taskText: tasksTexts) {
+            tasks.add(new Task(taskText, ACTIVE));
         }
-        js = js.substring(0, js.length()-1) + "]');"; //removing extra "," (last character in js)
-
-        executeJavaScript(js);
-        refresh();
+        return tasks.toArray(new Task[tasks.size()]);
     }
 }
