@@ -6,7 +6,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.By;
-import ua.com.anya.TodoMVCTest_v2.Task.Status;
 
 import java.util.ArrayList;
 
@@ -16,6 +15,7 @@ import static com.codeborne.selenide.Condition.*;
 import static com.codeborne.selenide.Selenide.*;
 import static ua.com.anya.TodoMVCTest_v2.Task.Status.ACTIVE;
 import static ua.com.anya.TodoMVCTest_v2.Task.Status.COMPLETED;
+import static ua.com.anya.TodoMVCTest_v2.Task.aTask;
 
 public class TodoMVCTest {
 
@@ -53,10 +53,10 @@ public class TodoMVCTest {
         givenAtAll("a", "b");
 
         toggleAll();
-        assertVisibleTasks("a", "b");
+        assertExistingTasks("a", "b");
         assertItemsLeft(0);
         openCompletedFilter();
-        assertExistingTasks("a", "b");
+        assertVisibleTasks("a", "b");
     }
 
     @Test
@@ -215,13 +215,13 @@ public class TodoMVCTest {
     }
 
     @Test
-    public void testTasksMainFlow(){
+    public void testTasksMainFlowThroughFilters(){
         givenAtAll();
 
         add("a");
+        toggle("a");
         assertExistingTasks("a");
 
-        toggle("a");
         openActiveFilter();
         assertVisibleTasksListIsEmpty();
 
@@ -229,6 +229,12 @@ public class TodoMVCTest {
         assertVisibleTasks("a");
 
         //activate
+        toggle("a");
+        assertVisibleTasksListIsEmpty();
+
+        openActiveFilter();
+        assertVisibleTasks("a");
+
         toggle("a");
         assertVisibleTasksListIsEmpty();
 
@@ -303,29 +309,24 @@ public class TodoMVCTest {
         $(By.linkText("Completed")).click();
     }
 
-    private Task aTask(String text, Status status){
-        return new Task(text, status);
-    }
-
     private void givenAtAll(Task... tasks){
-        addTasks(tasks);
+        given(tasks);
     }
 
     private void givenAtAll(String... tasksTexts){
-        addTasks(convertTaskTextsIntoTasks(tasksTexts));
+        givenAtAll(convertTaskTextsIntoTasks(tasksTexts));
     }
 
     private void givenAtAll(){
     }
 
     private void givenAtActive(Task... tasks){
-        addTasks(tasks);
+        given(tasks);
         openActiveFilter();
     }
 
     private void givenAtActive(String... tasksTexts){
-        addTasks(convertTaskTextsIntoTasks(tasksTexts));
-        openActiveFilter();
+        givenAtActive(convertTaskTextsIntoTasks(tasksTexts));
     }
 
     private void givenAtActive(){
@@ -333,26 +334,21 @@ public class TodoMVCTest {
     }
 
     private void givenAtCompleted(Task... tasks){
-        addTasks(tasks);
+        given(tasks);
         openCompletedFilter();
     }
 
     private void givenAtCompleted(String... tasksTexts){
-        addTasks(convertTaskTextsIntoTasks(tasksTexts));
-        openCompletedFilter();
+        givenAtCompleted(convertTaskTextsIntoTasks(tasksTexts));
     }
 
-    private String addTaskToJS(Task task){
-        boolean isCompleted = task.status == COMPLETED;
-        return "{\"completed\":" + isCompleted + ", \"title\":\"" +  task.text + "\"},";
-    }
-
-    private void addTasks(Task... tasks){
+    private void given(Task... tasks){
         String js = "localStorage.setItem('todos-troopjs', '[";
         for (Task task: tasks) {
-            js += addTaskToJS(task);
+            boolean isCompleted = task.status == COMPLETED;
+            js += "{\"completed\":" + isCompleted + ", \"title\":\"" +  task.text + "\"},";
         }
-        js = js.substring(0, js.length()-1) + "]');"; //removing extra "," (last character in js)
+        js = js.substring(0, js.length()-1) + "]');";
 
         executeJavaScript(js);
         refresh();

@@ -11,4 +11,8 @@ public class Task {
         this.text = text;
         this.status = status;
     }
+
+    public static Task aTask(String text, Status status){
+        return new Task(text, status);
+    }
 }
