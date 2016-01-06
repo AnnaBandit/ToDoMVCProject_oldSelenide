@@ -3,7 +3,6 @@ package ua.com.anya.TodoMVCTest_v2;
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.By;
 
@@ -13,16 +12,12 @@ import static com.codeborne.selenide.CollectionCondition.empty;
 import static com.codeborne.selenide.CollectionCondition.exactTexts;
 import static com.codeborne.selenide.Condition.*;
 import static com.codeborne.selenide.Selenide.*;
+import static com.codeborne.selenide.WebDriverRunner.url;
 import static ua.com.anya.TodoMVCTest_v2.Task.Status.ACTIVE;
 import static ua.com.anya.TodoMVCTest_v2.Task.Status.COMPLETED;
 import static ua.com.anya.TodoMVCTest_v2.Task.aTask;
 
 public class TodoMVCTest {
-
-    @Before
-    public void openApp(){
-        open("https://todomvc4tasj.herokuapp.com/");
-    }
 
     @After
     public void clearData(){
@@ -34,14 +29,14 @@ public class TodoMVCTest {
     public void testCreateOnAllFilter(){
         givenAtAll();
 
-        add("1", "2");
-        assertExistingTasks("1", "2");
+        add("a", "b");
+        assertExistingTasks("a", "b");
         assertItemsLeft(2);
     }
 
     @Test
     public void testEditOnAllFilter(){
-        givenAtAll("a", "b", "c");
+        given("a", "b", "c");
 
         startEdit("b", "b-edited").pressEnter();
         assertExistingTasks("a", "b-edited", "c");
@@ -50,7 +45,7 @@ public class TodoMVCTest {
 
     @Test
     public void testCompleteAllOnAllFilter(){
-        givenAtAll("a", "b");
+        given("a", "b");
 
         toggleAll();
         assertExistingTasks("a", "b");
@@ -61,7 +56,7 @@ public class TodoMVCTest {
 
     @Test
     public void testClearCompletedOnAllFilter(){
-        givenAtAll(aTask("a", COMPLETED),
+        given(aTask("a", COMPLETED),
                    aTask("b", COMPLETED),
                    aTask("c", ACTIVE));
 
@@ -72,7 +67,7 @@ public class TodoMVCTest {
 
     @Test
     public void testActivateAllOnAllFilter(){
-        givenAtAll(aTask("a", COMPLETED),
+        given(aTask("a", COMPLETED),
                    aTask("b", COMPLETED));
 
         toggleAll();
@@ -83,7 +78,7 @@ public class TodoMVCTest {
 
     @Test
     public void testActivateOnAllFilter(){
-        givenAtAll(aTask("a", COMPLETED),
+        given(aTask("a", COMPLETED),
                    aTask("b", COMPLETED));
 
         toggle("a");
@@ -94,7 +89,7 @@ public class TodoMVCTest {
 
     @Test
     public void testCancelEditingByESC(){
-        givenAtAll("a");
+        given("a");
 
         startEdit("a", "a-edited").pressEscape();
         assertExistingTasks("a");
@@ -103,7 +98,7 @@ public class TodoMVCTest {
 
     @Test
     public void testEditAndSaveByClickingOutside(){
-        givenAtAll("a", "b");
+        given("a", "b");
 
         startEdit("b", "b-edited");
         add("c");
@@ -113,7 +108,7 @@ public class TodoMVCTest {
 
     @Test
     public void testDeleteWhileEditing(){
-        givenAtAll("a", "b");
+        given("a", "b");
 
         startEdit("a", "").pressEnter();
         assertExistingTasks("b");
@@ -122,6 +117,8 @@ public class TodoMVCTest {
 
     @Test
     public void testDeleteOnAllFilter(){
+        givenAtAll();
+
         add("a", "b");
         assertExistingTasks("a", "b");
 
@@ -176,7 +173,7 @@ public class TodoMVCTest {
     //at Completed filter
     @Test
     public void testCreateOnCompletedFilter(){
-        givenAtCompleted("a");
+        givenAtCompleted(convertTaskTextsIntoActiveTasks("a"));
 
         add("b");
         assertVisibleTasksListIsEmpty();
@@ -309,40 +306,8 @@ public class TodoMVCTest {
         $(By.linkText("Completed")).click();
     }
 
-    private void givenAtAll(Task... tasks){
-        given(tasks);
-    }
-
-    private void givenAtAll(String... tasksTexts){
-        givenAtAll(convertTaskTextsIntoTasks(tasksTexts));
-    }
-
-    private void givenAtAll(){
-    }
-
-    private void givenAtActive(Task... tasks){
-        given(tasks);
-        openActiveFilter();
-    }
-
-    private void givenAtActive(String... tasksTexts){
-        givenAtActive(convertTaskTextsIntoTasks(tasksTexts));
-    }
-
-    private void givenAtActive(){
-        openActiveFilter();
-    }
-
-    private void givenAtCompleted(Task... tasks){
-        given(tasks);
-        openCompletedFilter();
-    }
-
-    private void givenAtCompleted(String... tasksTexts){
-        givenAtCompleted(convertTaskTextsIntoTasks(tasksTexts));
-    }
-
     private void given(Task... tasks){
+        givenAtAll();
         String js = "localStorage.setItem('todos-troopjs', '[";
         for (Task task: tasks) {
             boolean isCompleted = task.status == COMPLETED;
@@ -354,7 +319,31 @@ public class TodoMVCTest {
         refresh();
     }
 
-    private Task[] convertTaskTextsIntoTasks(String...tasksTexts){
+    private void given(String... tasksTexts){
+        given(convertTaskTextsIntoActiveTasks(tasksTexts));
+    }
+
+    private void givenAtAll(){
+        if (url()!=("https://todomvc4tasj.herokuapp.com/")) {
+            open("https://todomvc4tasj.herokuapp.com/");
+        }
+    }
+
+    private void givenAtActive(Task... tasks){
+        given(tasks);
+        openActiveFilter();
+    }
+
+    private void givenAtActive(String... tasksTexts){
+        givenAtActive(convertTaskTextsIntoActiveTasks(tasksTexts));
+    }
+
+    private void givenAtCompleted(Task... tasks){
+        given(tasks);
+        openCompletedFilter();
+    }
+
+    private Task[] convertTaskTextsIntoActiveTasks(String...tasksTexts){
         ArrayList<Task> tasks = new ArrayList<Task>();
         for (String taskText: tasksTexts) {
             tasks.add(new Task(taskText, ACTIVE));
