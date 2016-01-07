@@ -1,4 +1,4 @@
-package ua.com.anya.TodoMVCTest_v3.pagemodules.components;
+package ua.com.anya.TodoMVCTest_v3.pagemodules.pages;
 
 public class Task {
     public enum Status {

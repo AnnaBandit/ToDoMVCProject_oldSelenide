@@ -1,18 +1,18 @@
-package ua.com.anya.TodoMVCTest_v3.pageobjects.tests;
+package ua.com.anya.TodoMVCTest_v3.pageobjects;
 
 import org.junit.Test;
-import ua.com.anya.TodoMVCTest_v3.pageobjects.components.AtTodoMVCPageWithClearedDataAfterEachTest;
+import ua.com.anya.TodoMVCTest_v3.pageobjects.testconfigs.AtTodoMVCPageWithClearedDataAfterEachTest;
 import ua.com.anya.TodoMVCTest_v3.pageobjects.pages.TodoMVCPage;
 
-import static ua.com.anya.TodoMVCTest_v3.pageobjects.components.Task.Status.COMPLETED;
-import static ua.com.anya.TodoMVCTest_v3.pageobjects.components.Task.aTask;
+import static ua.com.anya.TodoMVCTest_v3.pageobjects.pages.Task.Status.COMPLETED;
+import static ua.com.anya.TodoMVCTest_v3.pageobjects.pages.Task.aTask;
 
 public class AtCompletedFilterTest extends AtTodoMVCPageWithClearedDataAfterEachTest{
     TodoMVCPage page = new TodoMVCPage();
 
     @Test
     public void testCreate(){
-        page.givenAtCompleted(page.convertTaskTextsIntoActiveTasks("a"));
+        page.givenAtCompleted("a");
 
         page.add("b");
         page.assertVisibleTasksListIsEmpty();

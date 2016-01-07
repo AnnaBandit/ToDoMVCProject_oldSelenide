@@ -3,7 +3,6 @@ package ua.com.anya.TodoMVCTest_v3.pageobjects.pages;
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
 import org.openqa.selenium.By;
-import ua.com.anya.TodoMVCTest_v3.pageobjects.components.Task;
 
 import java.util.ArrayList;
 
@@ -12,7 +11,7 @@ import static com.codeborne.selenide.CollectionCondition.exactTexts;
 import static com.codeborne.selenide.Condition.*;
 import static com.codeborne.selenide.Selenide.*;
 import static com.codeborne.selenide.WebDriverRunner.url;
-import static ua.com.anya.TodoMVCTest_v3.pageobjects.components.Task.Status.*;
+import static ua.com.anya.TodoMVCTest_v3.pageobjects.pages.Task.Status.*;
 
 public class TodoMVCPage {
     private ElementsCollection tasksList = $$("#todo-list li");
@@ -78,8 +77,15 @@ public class TodoMVCPage {
         $(By.linkText("Completed")).click();
     }
 
+    public static void ensureOpenedTodoMVC(){
+        if (url()!=("https://todomvc4tasj.herokuapp.com/")) {
+            open("https://todomvc4tasj.herokuapp.com/");
+        }
+    }
+
     public void given(Task... tasks){
-        givenAtAll();
+        ensureOpenedTodoMVC();
+
         String js = "localStorage.setItem('todos-troopjs', '[";
         for (Task task: tasks) {
             boolean isCompleted = task.getStatus() == COMPLETED;
@@ -91,14 +97,8 @@ public class TodoMVCPage {
         refresh();
     }
 
-    public void given(String... tasksTexts){
+    public void givenAtAll(String... tasksTexts){
         given(convertTaskTextsIntoActiveTasks(tasksTexts));
-    }
-
-    public void givenAtAll(){
-        if (url()!=("https://todomvc4tasj.herokuapp.com/")) {
-            open("https://todomvc4tasj.herokuapp.com/");
-        }
     }
 
     public void givenAtActive(Task... tasks){
@@ -115,7 +115,12 @@ public class TodoMVCPage {
         openCompletedFilter();
     }
 
-    public Task[] convertTaskTextsIntoActiveTasks(String...tasksTexts){
+    public void givenAtCompleted(String... tasksTexts){
+        given(convertTaskTextsIntoActiveTasks(tasksTexts));
+        openCompletedFilter();
+    }
+
+    private Task[] convertTaskTextsIntoActiveTasks(String...tasksTexts){
         ArrayList<Task> tasks = new ArrayList<Task>();
         for (String taskText: tasksTexts) {
             tasks.add(new Task(taskText, ACTIVE));

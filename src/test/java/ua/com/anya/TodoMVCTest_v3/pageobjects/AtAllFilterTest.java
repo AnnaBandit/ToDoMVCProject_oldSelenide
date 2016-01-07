@@ -1,12 +1,12 @@
-package ua.com.anya.TodoMVCTest_v3.pageobjects.tests;
+package ua.com.anya.TodoMVCTest_v3.pageobjects;
 
 import org.junit.Test;
-import ua.com.anya.TodoMVCTest_v3.pageobjects.components.AtTodoMVCPageWithClearedDataAfterEachTest;
+import ua.com.anya.TodoMVCTest_v3.pageobjects.testconfigs.AtTodoMVCPageWithClearedDataAfterEachTest;
 import ua.com.anya.TodoMVCTest_v3.pageobjects.pages.TodoMVCPage;
 
-import static ua.com.anya.TodoMVCTest_v3.pageobjects.components.Task.Status.ACTIVE;
-import static ua.com.anya.TodoMVCTest_v3.pageobjects.components.Task.Status.COMPLETED;
-import static ua.com.anya.TodoMVCTest_v3.pageobjects.components.Task.aTask;
+import static ua.com.anya.TodoMVCTest_v3.pageobjects.pages.Task.Status.ACTIVE;
+import static ua.com.anya.TodoMVCTest_v3.pageobjects.pages.Task.Status.COMPLETED;
+import static ua.com.anya.TodoMVCTest_v3.pageobjects.pages.Task.aTask;
 
 public class AtAllFilterTest extends AtTodoMVCPageWithClearedDataAfterEachTest{
 
@@ -14,7 +14,7 @@ public class AtAllFilterTest extends AtTodoMVCPageWithClearedDataAfterEachTest{
 
     @Test
     public void testCreate(){
-        page.givenAtAll();
+        page.ensureOpenedTodoMVC();
 
         page.add("a", "b");
         page.assertExistingTasks("a", "b");
@@ -23,7 +23,7 @@ public class AtAllFilterTest extends AtTodoMVCPageWithClearedDataAfterEachTest{
 
     @Test
     public void testEdit(){
-        page.given("a", "b", "c");
+        page.givenAtAll("a", "b", "c");
 
         page.startEdit("b", "b-edited").pressEnter();
         page.assertExistingTasks("a", "b-edited", "c");
@@ -32,7 +32,7 @@ public class AtAllFilterTest extends AtTodoMVCPageWithClearedDataAfterEachTest{
 
     @Test
     public void testCompleteAll(){
-        page.given("a", "b");
+        page.givenAtAll("a", "b");
 
         page.toggleAll();
         page.assertExistingTasks("a", "b");
@@ -76,7 +76,7 @@ public class AtAllFilterTest extends AtTodoMVCPageWithClearedDataAfterEachTest{
 
     @Test
     public void testCancelEditingByESC(){
-        page.given("a");
+        page.givenAtAll("a");
 
         page.startEdit("a", "a-edited").pressEscape();
         page.assertExistingTasks("a");
@@ -85,7 +85,7 @@ public class AtAllFilterTest extends AtTodoMVCPageWithClearedDataAfterEachTest{
 
     @Test
     public void testEditAndSaveByClickingOutside(){
-        page.given("a", "b");
+        page.givenAtAll("a", "b");
 
         page.startEdit("b", "b-edited");
         page.add("c");
@@ -95,7 +95,7 @@ public class AtAllFilterTest extends AtTodoMVCPageWithClearedDataAfterEachTest{
 
     @Test
     public void testDeleteWhileEditing(){
-        page.given("a", "b");
+        page.givenAtAll("a", "b");
 
         page.startEdit("a", "").pressEnter();
         page.assertExistingTasks("b");
@@ -104,7 +104,7 @@ public class AtAllFilterTest extends AtTodoMVCPageWithClearedDataAfterEachTest{
 
     @Test
     public void testDelete(){
-        page.givenAtAll();
+        page.ensureOpenedTodoMVC();
 
         page.add("a", "b");
         page.assertExistingTasks("a", "b");

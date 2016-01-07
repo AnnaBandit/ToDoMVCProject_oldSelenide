@@ -1,11 +1,11 @@
-package ua.com.anya.TodoMVCTest_v3.pageobjects.tests;
+package ua.com.anya.TodoMVCTest_v3.pageobjects;
 
 import org.junit.Test;
-import ua.com.anya.TodoMVCTest_v3.pageobjects.components.AtTodoMVCPageWithClearedDataAfterEachTest;
+import ua.com.anya.TodoMVCTest_v3.pageobjects.testconfigs.AtTodoMVCPageWithClearedDataAfterEachTest;
 import ua.com.anya.TodoMVCTest_v3.pageobjects.pages.TodoMVCPage;
 
-import static ua.com.anya.TodoMVCTest_v3.pageobjects.components.Task.Status.*;
-import static ua.com.anya.TodoMVCTest_v3.pageobjects.components.Task.aTask;
+import static ua.com.anya.TodoMVCTest_v3.pageobjects.pages.Task.Status.*;
+import static ua.com.anya.TodoMVCTest_v3.pageobjects.pages.Task.aTask;
 
 public class AtActiveFilterTest extends AtTodoMVCPageWithClearedDataAfterEachTest{
     TodoMVCPage page = new TodoMVCPage();

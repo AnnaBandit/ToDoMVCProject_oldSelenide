@@ -1,16 +1,16 @@
-package ua.com.anya.TodoMVCTest_v3.pageobjects.tests;
+package ua.com.anya.TodoMVCTest_v3.pageobjects;
 
 import org.junit.Test;
-import ua.com.anya.TodoMVCTest_v3.pageobjects.components.AtTodoMVCPageWithClearedDataAfterEachTest;
+import ua.com.anya.TodoMVCTest_v3.pageobjects.testconfigs.AtTodoMVCPageWithClearedDataAfterEachTest;
 import ua.com.anya.TodoMVCTest_v3.pageobjects.pages.TodoMVCPage;
 
-public class LifecycleTest extends AtTodoMVCPageWithClearedDataAfterEachTest{
+public class TaskLifeCycleTest extends AtTodoMVCPageWithClearedDataAfterEachTest{
 
     @Test
     public void testTasksMainFlowThroughFilters(){
         TodoMVCPage page = new TodoMVCPage();
 
-        page.givenAtAll();
+        page.ensureOpenedTodoMVC();
 
         page.add("a");
         page.toggle("a");

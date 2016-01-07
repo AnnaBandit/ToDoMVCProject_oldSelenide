@@ -1,4 +1,4 @@
-package ua.com.anya.TodoMVCTest_v3.pagemodules.components;
+package ua.com.anya.TodoMVCTest_v3.pageobjects.testconfigs;
 
 import org.junit.After;
 

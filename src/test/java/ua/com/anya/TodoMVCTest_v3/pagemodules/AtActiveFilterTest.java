@@ -1,16 +1,14 @@
-package ua.com.anya.TodoMVCTest_v3.pagemodules.tests;
+package ua.com.anya.TodoMVCTest_v3.pagemodules;
 
 import org.junit.Test;
-import ua.com.anya.TodoMVCTest_v3.pagemodules.components.AtTodoMVCPageWithClearedDataAfterEachTest;
-import ua.com.anya.TodoMVCTest_v3.pagemodules.pages.TodoMVCPage;
+import ua.com.anya.TodoMVCTest_v3.pagemodules.testconfigs.AtTodoMVCPageWithClearedDataAfterEachTest;
 
-import static ua.com.anya.TodoMVCTest_v3.pagemodules.pages.TodoMVCPage.*;
-import static ua.com.anya.TodoMVCTest_v3.pagemodules.components.Task.Status.ACTIVE;
-import static ua.com.anya.TodoMVCTest_v3.pagemodules.components.Task.Status.COMPLETED;
-import static ua.com.anya.TodoMVCTest_v3.pagemodules.components.Task.aTask;
+import static ua.com.anya.TodoMVCTest_v3.pagemodules.pages.Task.Status.ACTIVE;
+import static ua.com.anya.TodoMVCTest_v3.pagemodules.pages.Task.Status.COMPLETED;
+import static ua.com.anya.TodoMVCTest_v3.pagemodules.pages.Task.aTask;
+import static ua.com.anya.TodoMVCTest_v3.pagemodules.pages.TodoMVC.*;
 
 public class AtActiveFilterTest extends AtTodoMVCPageWithClearedDataAfterEachTest {
-    TodoMVCPage page = new TodoMVCPage();
 
     @Test
     public void testEditByPressingEnter(){
