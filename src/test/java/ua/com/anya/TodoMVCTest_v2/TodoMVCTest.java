@@ -27,7 +27,7 @@ public class TodoMVCTest {
     //at All filter
     @Test
     public void testCreateOnAllFilter(){
-        givenAtAll();
+        ensureOpenedTodoMVC();
 
         add("a", "b");
         assertExistingTasks("a", "b");
@@ -36,7 +36,7 @@ public class TodoMVCTest {
 
     @Test
     public void testEditOnAllFilter(){
-        given("a", "b", "c");
+        givenAtAll("a", "b", "c");
 
         startEdit("b", "b-edited").pressEnter();
         assertExistingTasks("a", "b-edited", "c");
@@ -45,7 +45,7 @@ public class TodoMVCTest {
 
     @Test
     public void testCompleteAllOnAllFilter(){
-        given("a", "b");
+        givenAtAll("a", "b");
 
         toggleAll();
         assertExistingTasks("a", "b");
@@ -57,8 +57,8 @@ public class TodoMVCTest {
     @Test
     public void testClearCompletedOnAllFilter(){
         given(aTask("a", COMPLETED),
-                   aTask("b", COMPLETED),
-                   aTask("c", ACTIVE));
+              aTask("b", COMPLETED),
+              aTask("c", ACTIVE));
 
         clearCompleted();
         assertExistingTasks("c");
@@ -68,7 +68,7 @@ public class TodoMVCTest {
     @Test
     public void testActivateAllOnAllFilter(){
         given(aTask("a", COMPLETED),
-                   aTask("b", COMPLETED));
+              aTask("b", COMPLETED));
 
         toggleAll();
         assertItemsLeft(2);
@@ -79,7 +79,7 @@ public class TodoMVCTest {
     @Test
     public void testActivateOnAllFilter(){
         given(aTask("a", COMPLETED),
-                   aTask("b", COMPLETED));
+              aTask("b", COMPLETED));
 
         toggle("a");
         assertItemsLeft(1);
@@ -89,7 +89,7 @@ public class TodoMVCTest {
 
     @Test
     public void testCancelEditingByESC(){
-        given("a");
+        givenAtAll("a");
 
         startEdit("a", "a-edited").pressEscape();
         assertExistingTasks("a");
@@ -98,7 +98,7 @@ public class TodoMVCTest {
 
     @Test
     public void testEditAndSaveByClickingOutside(){
-        given("a", "b");
+        givenAtAll("a", "b");
 
         startEdit("b", "b-edited");
         add("c");
@@ -108,7 +108,7 @@ public class TodoMVCTest {
 
     @Test
     public void testDeleteWhileEditing(){
-        given("a", "b");
+        givenAtAll("a", "b");
 
         startEdit("a", "").pressEnter();
         assertExistingTasks("b");
@@ -117,7 +117,7 @@ public class TodoMVCTest {
 
     @Test
     public void testDeleteOnAllFilter(){
-        givenAtAll();
+        ensureOpenedTodoMVC();
 
         add("a", "b");
         assertExistingTasks("a", "b");
@@ -150,8 +150,8 @@ public class TodoMVCTest {
     @Test
     public void testClearCompletedOnActiveFilter(){
         givenAtActive(aTask("a", COMPLETED),
-                aTask("b", COMPLETED),
-                aTask("c", ACTIVE));
+                      aTask("b", COMPLETED),
+                      aTask("c", ACTIVE));
 
         clearCompleted();
         assertExistingTasks("c");
@@ -213,7 +213,7 @@ public class TodoMVCTest {
 
     @Test
     public void testTasksMainFlowThroughFilters(){
-        givenAtAll();
+        ensureOpenedTodoMVC();
 
         add("a");
         toggle("a");
@@ -306,8 +306,15 @@ public class TodoMVCTest {
         $(By.linkText("Completed")).click();
     }
 
+    private void ensureOpenedTodoMVC(){
+        if (url()!=("https://todomvc4tasj.herokuapp.com/")) {
+            open("https://todomvc4tasj.herokuapp.com/");
+        }
+    }
+
     private void given(Task... tasks){
-        givenAtAll();
+        ensureOpenedTodoMVC();
+
         String js = "localStorage.setItem('todos-troopjs', '[";
         for (Task task: tasks) {
             boolean isCompleted = task.status == COMPLETED;
@@ -319,14 +326,8 @@ public class TodoMVCTest {
         refresh();
     }
 
-    private void given(String... tasksTexts){
+    private void givenAtAll(String... tasksTexts){
         given(convertTaskTextsIntoActiveTasks(tasksTexts));
-    }
-
-    private void givenAtAll(){
-        if (url()!=("https://todomvc4tasj.herokuapp.com/")) {
-            open("https://todomvc4tasj.herokuapp.com/");
-        }
     }
 
     private void givenAtActive(Task... tasks){
