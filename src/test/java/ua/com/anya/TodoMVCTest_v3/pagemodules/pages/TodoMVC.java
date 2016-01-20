@@ -44,17 +44,20 @@ public class TodoMVC {
     }
 
     public static WebElement startEdit(String taskText, String newTaskText){
-        WebElement elementForEditing = getWebDriver().findElement(By.xpath("//li//label[contains(text(), '" + taskText + "')]"));
-        doubleClick(elementForEditing);
-        getWebDriver().findElement(By.cssSelector(".editing")).findElement(By.cssSelector(".edit")).clear();
-        getWebDriver().findElement(By.cssSelector(".editing")).findElement(By.cssSelector(".edit")).sendKeys(newTaskText);
-        return getWebDriver().findElement(By.className("editing")).findElement(By.className("edit"));
+        doubleClick(getWebDriver().findElement(By.xpath("//li//label[contains(text(), '" + taskText + "')]")));
+
+        WebElement editableField = getWebDriver().findElement(By.cssSelector(".editing")).findElement(By.cssSelector(".edit"));
+
+        editableField.clear();
+        editableField.sendKeys(newTaskText);
+        return editableField;
     }
 
     public static void delete(String taskText){
         WebDriver driver = getWebDriver();
         Actions action = new Actions(driver);
         WebElement element = driver.findElement(By.xpath("//li//label[contains(text(), '" + taskText + "')]"));
+
         action.moveToElement(element).perform();
         driver.findElement(By.className("destroy")).click();
     }
