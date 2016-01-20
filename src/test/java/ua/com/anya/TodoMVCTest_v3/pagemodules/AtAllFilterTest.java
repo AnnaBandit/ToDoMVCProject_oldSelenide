@@ -1,6 +1,7 @@
 package ua.com.anya.TodoMVCTest_v3.pagemodules;
 
 import org.junit.Test;
+import org.openqa.selenium.Keys;
 import ua.com.anya.TodoMVCTest_v3.pagemodules.testconfigs.AtTodoMVCPageWithClearedDataAfterEachTest;
 
 import static ua.com.anya.TodoMVCTest_v3.pagemodules.pages.Task.Status.ACTIVE;
@@ -9,6 +10,8 @@ import static ua.com.anya.TodoMVCTest_v3.pagemodules.pages.Task.aTask;
 import static ua.com.anya.TodoMVCTest_v3.pagemodules.pages.TodoMVC.*;
 
 public class AtAllFilterTest extends AtTodoMVCPageWithClearedDataAfterEachTest {
+
+
 
     @Test
     public void testCreate(){
@@ -22,8 +25,9 @@ public class AtAllFilterTest extends AtTodoMVCPageWithClearedDataAfterEachTest {
     @Test
     public void testEdit(){
         givenAtAll("a", "b", "c");
+        tasksList.shouldHaveSize(3);
 
-        startEdit("b", "b-edited").pressEnter();
+        startEdit("b", "b-edited").sendKeys(Keys.ENTER);
         assertExistingTasks("a", "b-edited", "c");
         assertItemsLeft(3);
     }
@@ -75,8 +79,9 @@ public class AtAllFilterTest extends AtTodoMVCPageWithClearedDataAfterEachTest {
     @Test
     public void testCancelEditingByESC(){
         givenAtAll("a");
+        tasksList.shouldHaveSize(1);
 
-        startEdit("a", "a-edited").pressEscape();
+        startEdit("a", "a-edited").sendKeys(Keys.ESCAPE);
         assertExistingTasks("a");
         assertItemsLeft(1);
     }
@@ -84,6 +89,7 @@ public class AtAllFilterTest extends AtTodoMVCPageWithClearedDataAfterEachTest {
     @Test
     public void testEditAndSaveByClickingOutside(){
         givenAtAll("a", "b");
+        tasksList.shouldHaveSize(2);
 
         startEdit("b", "b-edited");
         add("c");
@@ -94,8 +100,9 @@ public class AtAllFilterTest extends AtTodoMVCPageWithClearedDataAfterEachTest {
     @Test
     public void testDeleteWhileEditing(){
         givenAtAll("a", "b");
+        tasksList.shouldHaveSize(2);
 
-        startEdit("a", "").pressEnter();
+        startEdit("a", "").sendKeys(Keys.ENTER);
         assertExistingTasks("b");
         assertItemsLeft(1);
     }

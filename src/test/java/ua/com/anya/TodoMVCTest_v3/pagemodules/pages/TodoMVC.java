@@ -1,8 +1,10 @@
 package ua.com.anya.TodoMVCTest_v3.pagemodules.pages;
 
 import com.codeborne.selenide.ElementsCollection;
-import com.codeborne.selenide.SelenideElement;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 
 import java.util.ArrayList;
 
@@ -10,8 +12,10 @@ import static com.codeborne.selenide.CollectionCondition.empty;
 import static com.codeborne.selenide.CollectionCondition.exactTexts;
 import static com.codeborne.selenide.Condition.*;
 import static com.codeborne.selenide.Selenide.*;
+import static com.codeborne.selenide.WebDriverRunner.getWebDriver;
 import static com.codeborne.selenide.WebDriverRunner.url;
-import static ua.com.anya.TodoMVCTest_v3.pagemodules.pages.Task.Status.*;
+import static ua.com.anya.TodoMVCTest_v3.pagemodules.pages.Task.Status.ACTIVE;
+import static ua.com.anya.TodoMVCTest_v3.pagemodules.pages.Task.Status.COMPLETED;
 
 public class TodoMVC {
     public static ElementsCollection tasksList = $$("#todo-list li");
@@ -39,13 +43,20 @@ public class TodoMVC {
         tasksList.shouldBe(empty);
     }
 
-    public static SelenideElement startEdit(String taskText, String newTaskText){
-        tasksList.find(exactText(taskText)).find("label").doubleClick();
-        return tasksList.find(cssClass("editing")).find(".edit").setValue(newTaskText);
+    public static WebElement startEdit(String taskText, String newTaskText){
+        WebElement elementForEditing = getWebDriver().findElement(By.xpath("//li//label[contains(text(), '" + taskText + "')]"));
+        doubleClick(elementForEditing);
+        getWebDriver().findElement(By.cssSelector(".editing")).findElement(By.cssSelector(".edit")).clear();
+        getWebDriver().findElement(By.cssSelector(".editing")).findElement(By.cssSelector(".edit")).sendKeys(newTaskText);
+        return getWebDriver().findElement(By.className("editing")).findElement(By.className("edit"));
     }
 
     public static void delete(String taskText){
-        tasksList.find(exactText(taskText)).hover().find(".destroy").click();
+        WebDriver driver = getWebDriver();
+        Actions action = new Actions(driver);
+        WebElement element = driver.findElement(By.xpath("//li//label[contains(text(), '" + taskText + "')]"));
+        action.moveToElement(element).perform();
+        driver.findElement(By.className("destroy")).click();
     }
 
     public static void toggle(String taskText){
@@ -126,5 +137,10 @@ public class TodoMVC {
             tasks.add(new Task(taskText, ACTIVE));
         }
         return tasks.toArray(new Task[tasks.size()]);
+    }
+
+    public static void doubleClick(WebElement element){
+        Actions action = new Actions(getWebDriver());
+        action.doubleClick(element).perform();
     }
 }

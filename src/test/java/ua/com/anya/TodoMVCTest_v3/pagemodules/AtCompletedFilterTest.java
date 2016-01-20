@@ -1,6 +1,7 @@
 package ua.com.anya.TodoMVCTest_v3.pagemodules;
 
 import org.junit.Test;
+import org.openqa.selenium.Keys;
 import ua.com.anya.TodoMVCTest_v3.pagemodules.testconfigs.AtTodoMVCPageWithClearedDataAfterEachTest;
 
 import static ua.com.anya.TodoMVCTest_v3.pagemodules.pages.Task.Status.COMPLETED;
@@ -24,7 +25,7 @@ public class AtCompletedFilterTest extends AtTodoMVCPageWithClearedDataAfterEach
     public void testEdit(){
         givenAtCompleted(aTask("a", COMPLETED));
 
-        startEdit("a", "a-edited").pressEnter();
+        startEdit("a", "a-edited").sendKeys(Keys.ENTER);
         assertVisibleTasks("a-edited");
         assertItemsLeft(0);
     }
